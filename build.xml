@@ -1,0 +1,66 @@
+<project name="Crawler" basedir="." default="all">
+	<presetdef name="javac">
+		<javac includeantruntime="false" />
+	</presetdef>
+
+	<property name="build.dir" value="build"/>
+	<property name="lib.dir" value="lib"/>
+	<property name="classes.dir" value="${build.dir}/classes"/>
+	<property name="jar.dir" value="${build.dir}/jar"/>
+	<property name="jar.name" value="Crawler.jar"/>
+	<property name="main.class" value="Crawler.Main"/>
+
+
+	<mkdir dir="${build.dir}"/>
+
+	<path id="lib.list">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+
+	<target name="clean" description="Delete generate files">
+		<delete dir="${build.dir}"/>
+	</target>
+
+	<target name="compile" description="Build the project">
+		<mkdir dir="${classes.dir}"/>
+		<javac destdir="${classes.dir}" debug="true">
+			<src path="src"/>
+			<classpath refid="lib.list"/>
+		</javac>
+	</target>
+
+	<target name="jar" description="Package the code" depends="compile">
+		<mkdir dir="${jar.dir}"/>
+		<jar destfile="${jar.dir}/${jar.name}" basedir="${classes.dir}">
+			<zipgroupfileset dir="${lib.dir}">
+				<include name="*.jar"/>
+			</zipgroupfileset>
+			<manifest>
+				<attribute name="Main-Class" value="${main.class}"/>
+			</manifest>
+			
+		</jar>
+	</target>
+
+	<target name="library" description="Make code into library" depends="compile">
+		<mkdir dir="${jar.dir}"/>
+		<jar destfile="${jar.dir}/${jar.name}" basedir="${classes.dir}">
+			<zipgroupfileset dir="${lib.dir}">
+				<include name="*.jar"/>
+			</zipgroupfileset>
+		</jar>
+	</target>
+
+	<target name="run" description="Run test main" depends="jar">
+		<java jar="${jar.dir}/${jar.name}" fork="true">
+			<assertions>
+				<enable/>
+			</assertions>
+		</java>
+	</target>
+
+	<target name="all" depends="clean,jar"/>
+
+</project>
